@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+
+  mysql:
+    image: mysql:5.7
+    ports:
+    - "3306:3306"
+    volumes:
+    - ${MYSQL_VOLUME:-mysql-volume}:/var/lib/mysql:Z
+    environment:
+    - MYSQL_USER=${MYSQL_USER}
+    - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+    - MYSQL_DATABASE=${MYSQL_DB}
+
+  mautic:
+    image: mautic/mautic
+    depends_on:
+      - mysql
+    ports:
+    - "80:80"
+    environment:
+    - MAUTIC_DB_HOST=mysql
+    - MAUTIC_DB_USER=${MYSQL_USER}
+    - MAUTIC_DB_PASSWORD=${MYSQL_PASSWORD}
+    - MAUTIC_TRUSTED_PROXIES=0.0.0.0/0
+    volumes:
+    - ${MAUTIC_VOLUME:-mautic-volume}:/var/www/html
+
+volumes:
+  mysql-volume:
+  mautic-volume:
